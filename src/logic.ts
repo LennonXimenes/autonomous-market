@@ -2,16 +2,24 @@ import { Request, Response } from "express";
 import { iProduct } from "./interfaces";
 import market from "./database";
 
+
 let id = 0;
 
 const readProduct = (req: Request, res: Response): Response | any => {
+
     return res.status(200).json(market)
 };
 
-const createProduct = (req: Request, res: Response): Response => {
-    id ++;
+const retrieveProduct = (req: Request, res: Response): Response | any => {
+    const prodIndex = res.locals.prodIndex;
 
-    let expirationDate = new Date();
+    return res.status(200).json(market[prodIndex]);
+}
+
+const createProduct = (req: Request, res: Response): Response => {
+    id++;
+    let expirationDate = new Date()
+    expirationDate.setFullYear(expirationDate.getFullYear() + 1);
 
     const newProduct: iProduct = {
         id,
@@ -28,4 +36,4 @@ const createProduct = (req: Request, res: Response): Response => {
     return res.status(201).json(newProduct);
 }
 
-export { readProduct, createProduct };
+export { readProduct, retrieveProduct, createProduct };
