@@ -1,4 +1,4 @@
-# self-sustaining-market
+# autonomous market
 
 Project Description: REST API Development for Autonomous Market Startup Inventory Management
 
