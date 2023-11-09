@@ -6,14 +6,15 @@ import market from "./database";
 let id = 0;
 
 const readProduct = (req: Request, res: Response): Response | any => {
+    const amount = market.reduce((acc, value): number | any => acc + value.price, 0)
 
-    return res.status(200).json(market)
+    return res.status(200).json({ total: amount, products: market })
 };
 
 const retrieveProduct = (req: Request, res: Response): Response | any => {
-    const prodIndex = res.locals.prodIndex;
+    const { foundProduct } = res.locals;
 
-    return res.status(200).json(market[prodIndex]);
+    return res.status(200).json(foundProduct);
 }
 
 const createProduct = (req: Request, res: Response): Response => {
@@ -23,11 +24,7 @@ const createProduct = (req: Request, res: Response): Response => {
 
     const newProduct: iProduct = {
         id,
-        name: req.body.name,
-        price: req.body.price,
-        weight: req.body.weight,
-        section: req.body.section,
-        calories: req.body.calories,
+        ...req.body,
         expirationDate,
     }
 
@@ -36,4 +33,20 @@ const createProduct = (req: Request, res: Response): Response => {
     return res.status(201).json(newProduct);
 }
 
-export { readProduct, retrieveProduct, createProduct };
+const updateProduct = (req: Request, res: Response): Response => {
+    let { foundProduct } = res.locals;
+
+    foundProduct = Object.assign(foundProduct, req.body);
+
+    return res.status(200).json(foundProduct);
+}
+
+const deleteProduct = (req: Request, res: Response): Response => {
+    const { prodIndex } = res.locals;
+
+    market.splice(prodIndex, 1);
+
+    return res.status(204).json()
+}
+
+export { readProduct, retrieveProduct, createProduct, updateProduct, deleteProduct };

@@ -2,21 +2,26 @@ import { NextFunction, Request, Response } from "express";
 import market from "./database";
 import { iProduct } from "./interfaces";
 
+const requestLog = (req: Request, res: Response, next: NextFunction): Response | void => {
+    console.log(`${req.method}: ${req.url}`);
+
+    return next();
+}
+
 const verifyId = (req: Request, res: Response, next: NextFunction): Response | void => {
     const { id } = req.params;
-    console.log(id)
 
     const prodIndex: number = market.findIndex(
-        (product) => product.id === Number(id)
+        (product: iProduct) => product.id === Number(id)
     );
-    console.log(prodIndex)
-
 
     if (prodIndex === -1) {
         return res.status(404).json({ message: "Product not found." });
     };
 
-    res.locals.prodIndex = prodIndex;
+    const foundProduct = market[prodIndex];
+
+    res.locals = { ...res.locals, prodIndex, foundProduct };
 
     return next();
 }
@@ -24,16 +29,19 @@ const verifyId = (req: Request, res: Response, next: NextFunction): Response | v
 const verifyName = (req: Request, res: Response, next: NextFunction): Response | void => {
     const name = req.body.name;
 
-    const findProduct = market.find(
-        (product) => product.name === name
-    )
+    if (!name) {
+        return next();
+    };
+
+    const findProduct: iProduct | undefined = market.find(
+        (product: iProduct) => product.name === name
+    );
 
     if (findProduct) {
-        return res.status(409).json({ message: "Product already registered." })
-
-    }
+        return res.status(409).json({ message: "Product already registered." });
+    };
 
     return next();
 }
 
-export { verifyId, verifyName };
+export { requestLog, verifyId, verifyName };
