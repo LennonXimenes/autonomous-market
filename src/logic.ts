@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import { iProduct } from "./interfaces";
 import market from "./database";
 
-
 let id = 0;
 
 const readProduct = (req: Request, res: Response): Response | any => {
